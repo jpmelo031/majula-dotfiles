@@ -6,6 +6,8 @@ A warm, dark Hyprland desktop for Arch Linux inspired by Majula from Dark Souls 
 
 ![Rice showcase: fastfetch, btop, cava, tty-clock and cbonsai](screenshots/rice.png)
 
+![VS Code with the Majula theme](screenshots/vscode.png)
+
 ## What's inside
 
 | Part | Files |

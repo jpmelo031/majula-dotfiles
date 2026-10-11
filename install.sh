@@ -7,21 +7,28 @@ set -euo pipefail
 repo="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 backup="${XDG_STATE_HOME:-$HOME/.local/state}/majula-backup/$(date +%Y-%m-%d_%H-%M-%S)"
 
+# A repo file as it should look on this machine.
+render() {
+  if [[ $1 == */.config/qt6ct/qt6ct.conf ]]; then
+    sed "s|^color_scheme_path=~/|color_scheme_path=$HOME/|" "$1"   # qt6ct needs an absolute path
+  else
+    cat "$1"
+  fi
+}
+
 echo "==> Dotfiles"
 cd "$repo/home"
 while IFS= read -r -d '' file; do
   rel=${file#./}
   dest="$HOME/$rel"
-  if [[ -e $dest ]] && ! cmp -s "$file" "$dest"; then
+  if [[ -e $dest ]] && ! cmp -s <(render "$file") "$dest"; then
     mkdir -p "$backup/$(dirname "$rel")"
     mv "$dest" "$backup/$rel"
   fi
   mkdir -p "$(dirname "$dest")"
-  cp -p "$file" "$dest"
+  render "$file" > "$dest"
+  chmod --reference="$file" "$dest"
 done < <(find . -type f -print0)
-
-# qt6ct only accepts an absolute path to the color scheme.
-sed -i "s|^color_scheme_path=.*|color_scheme_path=$HOME/.config/qt6ct/colors/Majula.conf|" "$HOME/.config/qt6ct/qt6ct.conf"
 
 mkdir -p "$HOME/.local/bin"
 ln -sf "$HOME/.config/hypr/scripts/rice" "$HOME/.local/bin/rice"
