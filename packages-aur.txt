@@ -1,0 +1,6 @@
+# AUR packages (yay -S --needed - < packages-aur.txt)
+visual-studio-code-bin
+zen-browser-bin
+cbonsai
+tty-clock
+pipes.sh

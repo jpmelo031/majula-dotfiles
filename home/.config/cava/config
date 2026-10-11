@@ -1,0 +1,23 @@
+# Majula cava: ember-to-gold bars for whatever is playing (PipeWire).
+[general]
+framerate = 60
+bar_width = 2
+bar_spacing = 1
+
+[input]
+method = pipewire
+source = auto
+
+[output]
+method = noncurses
+channels = stereo
+
+[color]
+gradient = 1
+gradient_color_1 = '#C06452'
+gradient_color_2 = '#E0783E'
+gradient_color_3 = '#D1A35C'
+gradient_color_4 = '#E3BB7A'
+
+[smoothing]
+noise_reduction = 77

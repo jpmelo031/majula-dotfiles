@@ -1,0 +1,123 @@
+/* Majula theme for Rofi (fully replaces the default theme) */
+
+* {
+    background: #0E1114;
+    elevated:   #20272CF2;
+    border-c:   #465056;
+    text:       #DDD6C6;
+    muted:      #A39B8C;
+    accent:     #D1A35C;
+    ember:      #E0783E;
+    danger:     #C06452;
+
+    font: "Inter 11";
+    background-color: transparent;
+    text-color: @text;
+}
+
+window {
+    width: 460px;
+    location: center;
+    anchor: center;
+    background-color: @elevated;
+    border: 1px;
+    border-color: @border-c;
+    border-radius: 12px;
+}
+
+mainbox {
+    padding: 14px;
+    spacing: 12px;
+    children: [ "inputbar", "message", "listview" ];
+}
+
+inputbar {
+    padding: 10px 12px;
+    spacing: 10px;
+    border-radius: 8px;
+    background-color: #0E111499;
+    border: 0 0 2px 0;
+    border-color: @ember;
+    children: [ "prompt", "entry" ];
+}
+
+prompt {
+    font: "JetBrainsMono Nerd Font 12";
+    text-color: @ember;
+}
+
+entry {
+    placeholder: "Buscar…";
+    placeholder-color: @muted;
+    cursor: text;
+}
+
+message {
+    padding: 8px 10px;
+    border-radius: 8px;
+    background-color: #0E111466;
+}
+
+textbox {
+    text-color: @muted;
+}
+
+listview {
+    lines: 7;
+    columns: 1;
+    spacing: 2px;
+    fixed-height: true;
+    scrollbar: false;
+}
+
+element {
+    padding: 7px 10px;
+    spacing: 10px;
+    border-radius: 7px;
+    children: [ "element-icon", "element-text" ];
+}
+
+element-icon {
+    size: 22px;
+    vertical-align: 0.5;
+}
+
+element-icon,
+element-text {
+    background-color: transparent;
+    text-color: inherit;
+}
+
+element-text {
+    vertical-align: 0.5;
+    highlight: bold #D1A35C;
+}
+
+element normal.normal,
+element alternate.normal,
+element normal.active,
+element alternate.active {
+    background-color: transparent;
+    text-color: @text;
+}
+
+element normal.urgent,
+element alternate.urgent {
+    background-color: transparent;
+    text-color: @danger;
+}
+
+element selected.normal,
+element selected.active {
+    background-color: #D1A35C26;
+    text-color: @accent;
+}
+
+element selected.urgent {
+    background-color: #C0645233;
+    text-color: @danger;
+}
+
+element-text selected {
+    text-color: @accent;
+}

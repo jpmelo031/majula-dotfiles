@@ -1,0 +1,28 @@
+{
+    // Majula look (theme from vscode/majula-theme in the dotfiles repo)
+    "workbench.colorTheme": "Majula",
+    "workbench.startupEditor": "none",
+    "workbench.tree.indent": 14,
+    "window.titleBarStyle": "custom",
+    "window.commandCenter": true,
+    "window.menuBarVisibility": "toggle",
+
+    // Same fonts as the terminal
+    "editor.fontFamily": "'JetBrainsMono Nerd Font', monospace",
+    "editor.fontSize": 13,
+    "editor.lineHeight": 1.6,
+    "editor.fontLigatures": true,
+    "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font'",
+    "terminal.integrated.fontSize": 12,
+    "terminal.integrated.cursorStyle": "line",
+
+    // Calm editor for a 1366x768 screen
+    "editor.minimap.enabled": false,
+    "editor.cursorBlinking": "smooth",
+    "editor.cursorSmoothCaretAnimation": "on",
+    "editor.smoothScrolling": true,
+    "editor.bracketPairColorization.enabled": true,
+    "editor.guides.bracketPairs": "active",
+    "editor.renderLineHighlight": "all",
+    "editor.stickyScroll.enabled": false
+}

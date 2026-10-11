@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# Rice showcase: fastfetch, btop, cava, a clock and a bonsai tiled neatly on an empty workspace.
+#   rice            open the layout (run it again to close everything)
+#   rice <panel>    run a single panel in the current terminal: fetch | top | cava | clock | bonsai
+set -euo pipefail
+
+self=$(readlink -f "$0")
+
+case "${1:-}" in
+  fetch)  clear; fastfetch; exec bash ;;
+  top)    exec btop ;;
+  cava)   exec cava ;;
+  clock)  exec tty-clock -c -C 3 -f '%A, %B %d' ;;
+  bonsai) exec cbonsai -l -i -w 8 -L 34 -t 0.04 ;;
+  "")     ;;
+  *)      echo "usage: rice [fetch|top|cava|clock|bonsai]" >&2; exit 2 ;;
+esac
+
+# Already open? Close every panel instead.
+if hyprctl clients | grep -q 'class: rice-'; then
+  pkill -f '^kitty --class rice-' || true
+  exit 0
+fi
+
+missing=$(for cmd in fastfetch btop cava tty-clock cbonsai; do command -v "$cmd" >/dev/null || printf '%s ' "$cmd"; done)
+if [[ -n $missing ]]; then
+  notify-send -a Rice "Missing programs" "Install: $missing"
+  exit 1
+fi
+
+# Usable area of the focused monitor, matching the tiled windows
+# (gaps_out 8 + border 2 around, 12 px between panels, waybar reserved on top).
+read -r left top width height < <(hyprctl monitors -j | python3 -c '
+import json, sys
+m = next(m for m in json.load(sys.stdin) if m["focused"])
+l, t, r, b = m["reserved"]
+w, h = round(m["width"] / m["scale"]), round(m["height"] / m["scale"])
+edge = 10
+print(m["x"] + l + edge, m["y"] + t + edge, w - l - r - 2 * edge, h - t - b - 2 * edge)')
+gap=12
+
+# Left column: fetch over cava. Right column: btop over clock + bonsai.
+lw=$(( (width - gap) * 42 / 100 ));  rw=$(( width - gap - lw ));  rx=$(( left + lw + gap ))
+fh=$(( (height - gap) * 57 / 100 )); ch=$(( height - gap - fh ))
+th=$(( (height - gap) * 60 / 100 )); bh=$(( height - gap - th ))
+cw=$(( (rw - gap) / 2 ));            bw=$(( rw - gap - cw ))
+
+hyprctl dispatch 'hl.dsp.focus({ workspace = "empty" })' >/dev/null
+workspace=$(hyprctl activeworkspace | awk 'NR == 1 { print $3 }')
+
+open() { # name x y w h  (only the fetch panel takes focus, so you can type in its shell)
+  local focus=false; [[ $1 == fetch ]] && focus=true
+  hyprctl dispatch "hl.dsp.exec_cmd(\"kitty --class rice-$1 -o font_size=9 $self $1\", {
+    float = true, workspace = \"$workspace\", move = \"$2 $3\", size = \"$4 $5\", no_initial_focus = not $focus })" >/dev/null
+}
+
+open fetch  "$left" "$top"                    "$lw" "$fh"
+open cava   "$left" $(( top + fh + gap ))     "$lw" "$ch"
+open top    "$rx"   "$top"                    "$rw" "$th"
+open clock  "$rx"   $(( top + th + gap ))     "$cw" "$bh"
+open bonsai $(( rx + cw + gap )) $(( top + th + gap )) "$bw" "$bh"

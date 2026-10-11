@@ -1,0 +1,41 @@
+# Official Arch packages (sudo pacman -S --needed - < packages.txt)
+# Session
+hyprland
+uwsm
+sddm
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+polkit-kde-agent
+# Desktop
+waybar
+hyprpaper
+hypridle
+hyprlock
+rofi
+dunst
+libnotify
+network-manager-applet
+cliphist
+wl-clipboard
+grim
+slurp
+brightnessctl
+playerctl
+pavucontrol
+# Apps
+kitty
+dolphin
+qt6ct
+# Look
+papirus-icon-theme
+ttf-jetbrains-mono-nerd
+inter-font
+ttf-cormorant
+# Rice
+fastfetch
+cava
+btop
+cmatrix
+# Used by the scripts
+python
+librsvg

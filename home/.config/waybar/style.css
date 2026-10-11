@@ -1,0 +1,126 @@
+/* Waybar Majula */
+
+@define-color background #0E1114;
+@define-color surface    #171C20;
+@define-color elevated   #20272C;
+@define-color border     #465056;
+@define-color text       #DDD6C6;
+@define-color muted      #A39B8C;
+@define-color accent     #D1A35C;
+@define-color ember      #E0783E;
+@define-color danger     #C06452;
+
+* {
+    font-family: "Inter", "JetBrainsMono Nerd Font", sans-serif;
+    font-size: 12.5px;
+    min-height: 0;
+    border: none;
+    border-radius: 0;
+}
+
+window#waybar {
+    background: alpha(@surface, 0.86);
+    border: 1px solid alpha(@border, 0.6);
+    border-radius: 10px;
+    color: @text;
+}
+
+tooltip {
+    background: @elevated;
+    border: 1px solid @border;
+    border-radius: 8px;
+}
+
+tooltip label {
+    color: @text;
+}
+
+#custom-launcher,
+#custom-power {
+    font-family: "JetBrainsMono Nerd Font";
+    font-size: 14px;
+    padding: 0 12px;
+    color: @accent;
+}
+
+#custom-power {
+    color: @muted;
+}
+
+#custom-power:hover {
+    color: @ember;
+}
+
+#workspaces {
+    margin: 4px 0;
+}
+
+#workspaces button {
+    padding: 0 8px;
+    margin: 0 2px;
+    border-radius: 6px;
+    color: @muted;
+    background: transparent;
+    transition: background 150ms ease, color 150ms ease;
+}
+
+#workspaces button.empty {
+    color: alpha(@muted, 0.45);
+}
+
+#workspaces button.active {
+    background: @accent;
+    color: @background;
+    font-weight: 600;
+}
+
+#workspaces button.urgent {
+    background: @ember;
+    color: @background;
+}
+
+#workspaces button:hover {
+    background: alpha(@accent, 0.18);
+    color: @text;
+    box-shadow: none;
+}
+
+#workspaces button.active:hover {
+    background: @accent;
+    color: @background;
+}
+
+#window {
+    padding: 0 10px;
+    color: @muted;
+}
+
+window#waybar.empty #window {
+    padding: 0;
+}
+
+#clock {
+    padding: 0 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+#tray,
+#backlight,
+#pulseaudio {
+    padding: 0 9px;
+}
+
+#backlight,
+#pulseaudio {
+    font-family: "JetBrainsMono Nerd Font", "Inter";
+}
+
+#pulseaudio.muted {
+    color: @danger;
+}
+
+#tray > .needs-attention {
+    background: alpha(@ember, 0.3);
+    border-radius: 6px;
+}

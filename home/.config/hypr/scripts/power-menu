@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Session menu in Rofi: lock, log out, suspend, reboot, shut down.
+set -euo pipefail
+
+choice=$(printf '%s\n' \
+  "󰌾  Lock" \
+  "󰍃  Log out" \
+  "󰤄  Suspend" \
+  "󰜉  Reboot" \
+  "󰐥  Shut down" |
+  rofi -dmenu -i -p "⏻" -theme-str 'window { width: 260px; } listview { lines: 5; } inputbar { enabled: false; }') || exit 0
+
+case "$choice" in
+  *Lock)      loginctl lock-session ;;
+  *Log\ out)  uwsm stop ;;
+  *Suspend)   systemctl suspend ;;
+  *Reboot)    systemctl reboot ;;
+  *Shut\ down) systemctl poweroff ;;
+esac

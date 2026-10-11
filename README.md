@@ -1,172 +1,103 @@
-# Simple Custom Arch
+# Majula dotfiles
 
-Simple Custom Arch is an additive Majula theme and desktop configuration for an existing Hyprland session. It keeps the generated Hyprland configuration in place, adds one Lua module, and manages individual XDG files through recoverable symbolic links.
+A warm, dark Hyprland desktop for Arch Linux inspired by Majula from Dark Souls II: ember and gold on charcoal, with the sea at sunset as the wallpaper.
 
-The current desktop scope is complete. Phases 0 through 4 cover the repository foundation, dependencies, Hyprland additions, desktop services, and visual theme. The planned update interface is not included.
+![Desktop](screenshots/desktop.png)
 
-![Majula desktop preview](docs/assets/theme-preview.svg)
+![Rice showcase: fastfetch, btop, cava, tty-clock and cbonsai](screenshots/rice.png)
 
-## Included
+## What's inside
 
-- Majula colors for Hyprland, Waybar, Rofi, Kitty, Dunst, Hyprlock, GTK 3, GTK 4, Qt/KDE, and VS Code.
-- A compact 28 px Waybar with workspaces, active window, clock, volume, and tray.
-- A Rofi launcher with application, window, command, and file modes.
-- Wallpaper, lock, idle display control, notifications, clipboard history, and screenshots.
-- Numeric-keypad keybindings that use physical keycodes and work independently of Num Lock.
-- User services that start each persistent desktop component once.
-- Dry-run deployment, timestamped backups, conflict detection, and repository/live verification.
-
-The project does not install packages, replace whole configuration directories, modify boot files, add a kernel, install Steam, or perform power actions.
-
-## Compatibility
-
-The current target is Arch Linux, Wayland, UWSM, and a 1366x768 display. The Hyprland integration expects an existing generated `~/.config/hypr/hyprland.lua` that supports the `hl` Lua API. The repository appends exactly one `require("majula")` line to that file.
-
-Keep the repository at a stable path after deployment because managed destinations are symbolic links into the checkout.
-
-## Dependencies
-
-The exact direct runtime package lists are:
-
-- [Official Arch packages](packages/official.txt)
-- [Reviewed foreign applications](packages/aur.txt)
-- [Package roles and verification tools](packages/README.md)
-
-Review the manifests before installation. Install official dependencies only as part of a complete upgrade:
-
-```bash
-sudo pacman -Syu --needed $(< packages/official.txt)
-```
-
-The two foreign applications are `visual-studio-code-bin` and `zen-browser-bin`. Review their PKGBUILDs and install them with a trusted local build workflow. No particular AUR helper is required.
-
-Repository verification also uses `file`, `git`, `libxml2`, `python`, and `ripgrep`.
-
-## Installation
-
-Run each command from the repository root.
-
-1. Verify repository content without querying the running desktop:
-
-   ```bash
-   ./scripts/verify --root "$PWD"
-   ```
-
-2. Review the additive deployment:
-
-   ```bash
-   ./scripts/install-desktop --dry-run
-   ./scripts/apply-theme --dry-run
-   ```
-
-3. Apply the managed links and desktop preferences:
-
-   ```bash
-   ./scripts/install-desktop --apply
-   ./scripts/apply-theme --apply
-   ```
-
-4. Load and enable the graphical-session services:
-
-   ```bash
-   systemctl --user daemon-reload
-   systemctl --user enable --now simple-custom-arch-session.target
-   hyprctl reload
-   ```
-
-5. Verify the active desktop:
-
-   ```bash
-   ./scripts/verify
-   ```
-
-Deployment stops before making changes when a managed destination contains an unrelated file, directory, or broken link. It never overwrites an existing application configuration.
-
-## Keybindings
-
-Existing generated Hyprland bindings remain available. This module adds:
-
-| Binding | Action | Command or component |
-|---|---|---|
-| `Super + keypad 0` | Open the Rofi application launcher | `rofi -show drun` |
-| `Super + keypad 1…9` | Open workspace 1…9 | Hyprland workspace focus |
-| `Super + Shift + keypad 1…9` | Move the active window to workspace 1…9 | Hyprland window move |
-| `Alt + keypad 8` / `Alt + keypad 2` | Increase / decrease brightness by 5% | `brightnessctl` |
-| `Alt + keypad 6` / `Alt + keypad 4` | Increase / decrease volume by 5% | `wpctl` |
-| `Alt + keypad 5` | Toggle output mute | `wpctl` |
-| `Alt + keypad 0` | Play or pause media | `playerctl` |
-| `Alt + keypad 9` / `Alt + keypad 7` | Next / previous media item | `playerctl` |
-| `Alt + keypad 1` | Capture the full screen | Grim |
-| `Alt + keypad 3` | Select and capture an area | Slurp and Grim |
-| `Super + B` | Open Zen Browser | `zen-browser` |
-| `Super + Shift + C` | Open VS Code | `code` |
-| `Super + L` | Lock the session | `loginctl lock-session` |
-| `Super + Shift + V` | Open clipboard history | Cliphist and Rofi |
-| `Print` | Capture the full screen | Grim |
-| `Super + Alt + S` | Select and capture an area | Slurp and Grim |
-| `Super + Shift + E` | Open the lock, logout, and cancel menu | Rofi and UWSM |
-
-Physical keypad codes are documented in [the current desktop design](docs/superpowers/specs/2026-10-09-additive-desktop-configuration-design.md).
-
-## Appearance
-
-- Inner and outer Hyprland gaps: 6 px.
-- Focused border: 2 px in Majula ember.
-- Rounding: 6 px.
-- Blur: one 4 px pass.
-- Waybar height: 28 px.
-- Kitty background opacity: 84%.
-- Cursor: Adwaita at 24 px.
-- Icons: Breeze Dark.
-- Fonts: Noto Sans at application-specific compact sizes.
-
-The palette and component mappings live in [docs/theme.md](docs/theme.md).
-
-## Managed Services
-
-`simple-custom-arch-session.target` starts:
-
-| Unit | Responsibility |
+| Part | Files |
 |---|---|
-| `simple-custom-arch-waybar.service` | Status bar |
-| `simple-custom-arch-hyprpaper.service` | Wallpaper |
-| `simple-custom-arch-hypridle.service` | Lock and display-off timers |
-| `simple-custom-arch-cliphist.service` | Clipboard history capture |
-| `dunst.service` | Notifications |
+| Hyprland look, autostart and keybinds | `home/.config/hypr/majula.lua` |
+| Wallpaper, lock screen and idle | `home/.config/hypr/hyprpaper.conf`, `hyprlock.conf`, `hypridle.conf` |
+| Bar, launcher and notifications | `home/.config/waybar/`, `rofi/`, `dunst/` |
+| Terminal | `home/.config/kitty/kitty.conf` |
+| GTK, Qt and KDE apps (Dolphin) in dark Majula | `home/.config/gtk-3.0/`, `gtk-4.0/`, `qt6ct/`, `kdeglobals`, `home/.local/share/color-schemes/` |
+| VS Code theme and settings | `vscode/majula-theme/`, `home/.config/Code/User/settings.json` |
+| Rice showcase | `home/.config/hypr/scripts/rice`, `home/.config/fastfetch/`, `cava/`, `btop/` |
+| Keypad keyboard option | `home/.config/xkb/` |
+| Login screen (SDDM) and system settings | `system/` |
 
-Each project service uses `Restart=on-failure` and belongs to the graphical-session target.
+The setup targets one notebook (Samsung 300E5M, 1366x768, Hyprland 0.56 with the Lua config under UWSM, SDDM, ABNT2 keyboard), so sizes are tuned for that screen.
 
-## Backups and Recovery
+## Install
 
-Runtime backups are stored outside Git under `${XDG_STATE_HOME:-~/.local/state}/simple-custom-arch/backups/`.
+1. Install the packages:
 
-- `install-desktop --apply` backs up the existing generated Hyprland file before appending the Majula import.
-- `apply-theme --apply` records every changed desktop preference and restores earlier values automatically if an operation fails.
-- Existing unrelated destinations are left untouched.
-- Logs, backups, credentials, and personal application data are never committed.
+   ```bash
+   grep -v '^#' packages.txt | sudo pacman -S --needed -
+   grep -v '^#' packages-aur.txt | yay -S --needed -
+   ```
 
-See [docs/maintenance.md](docs/maintenance.md) for validation and recovery steps.
+2. Copy the dotfiles into your home folder. Files that would be replaced are backed up to `~/.local/state/majula-backup/` first. Hyprland's own `hyprland.lua` is kept; the installer only adds `require("majula")` to its last line.
 
-## Verification
+   ```bash
+   ./install.sh
+   ```
 
-Run the focused tests individually:
+3. Apply the parts that need root: the SDDM login theme, Num Lock from boot, the ABNT2 keymap, and the lid and hibernation rules.
+
+   ```bash
+   sudo bash system/apply-system.sh
+   ```
+
+4. Reboot.
+
+## Keybinds
+
+| Keys | Action |
+|---|---|
+| `Super + Q` | Terminal (kitty) |
+| `Super + R` | App launcher (Rofi) |
+| `Super + E` | Files (Dolphin) |
+| `Super + B` | Browser (Zen) |
+| `Super + C` | Close window |
+| `Super + F` | Fullscreen |
+| `Super + V` | Toggle floating |
+| `Super + L` | Lock screen |
+| `Super + Escape` | Power menu |
+| `Super + Shift + V` | Clipboard history |
+| `Super + Shift + R` | Open or close the rice showcase |
+| `Print` / `Shift + Print` | Screenshot of an area or the whole screen (saved and copied) |
+| `Super + 1..0` or `Super + keypad 1..0` | Switch workspace (add `Shift` to move the window) |
+| `Shift + keypad 1..0` | `! @ # $ % ¨ & * ( )`, like the number row |
+| `AltGr + F1` / `AltGr + F4` | Send `F2` / `F5` |
+
+The last three rows exist because the notebook's `5`, `6`, `F2` and `F5` keys are broken. The keypad always types numbers, whatever the Num Lock state.
+
+## Rice
+
+`rice` (or `Super + Shift + R`) opens fastfetch, btop, cava, tty-clock and cbonsai as neat panels on an empty workspace. Run it again to close them. Each panel also runs alone: `rice fetch`, `rice top`, `rice cava`, `rice clock` and `rice bonsai`. `pipes.sh` and `cmatrix` are installed too.
+
+## Idle
+
+The screen dims after 5 minutes, locks after 10 and turns off after 15. The notebook never hibernates, and closing the lid only locks it.
+
+## Keeping the repo up to date
+
+After changing something on the machine, copy the tracked files back and commit:
 
 ```bash
-./tests/desktop-config.sh
-./tests/install-desktop.sh
-./tests/apply-theme.sh
-./tests/phase1-manifests.sh
-./tests/phase1-verify.sh
-./tests/verify.sh
+./sync.sh
+git diff
 ```
 
-Run `./scripts/verify --root "$PWD"` for repository-only checks or `./scripts/verify` for repository and live-session checks.
+## Palette
 
-## Project Documentation
+| Name | Hex | Used for |
+|---|---|---|
+| Background | `#0E1114` | Base of everything |
+| Surface | `#171C20` | Panels and sidebars |
+| Elevated | `#20272C` | Menus and popups |
+| Border | `#465056` | Inactive borders |
+| Text | `#DDD6C6` | Main text |
+| Muted | `#A39B8C` | Secondary text |
+| Accent | `#D1A35C` | Gold highlights |
+| Ember | `#E0783E` | Focus and the active border |
+| Info | `#7899A2` | Links and info |
+| Success | `#87996D` | Strings and success |
+| Danger | `#C06452` | Errors |
 
-- [Repository contract](AGENTS.md)
-- [Roadmap](ROADMAP.md)
-- [Theme reference](docs/theme.md)
-- [Maintenance and recovery](docs/maintenance.md)
-- [Current design](docs/superpowers/specs/2026-10-09-additive-desktop-configuration-design.md)
-- [Completed implementation plan](docs/superpowers/plans/2026-10-09-additive-desktop-configuration.md)
+Fonts are Inter (interface), JetBrainsMono Nerd Font (terminal and code) and Cormorant Garamond (clocks). Icons are Papirus-Dark.

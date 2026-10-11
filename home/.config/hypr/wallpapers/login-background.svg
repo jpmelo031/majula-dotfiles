@@ -1,0 +1,12 @@
+<!-- SDDM login background: the wallpaper blurred and dimmed like hyprlock.
+     Render (from this folder): rsvg-convert login-background.svg -o background.png, then copy it to system/sddm-majula/ -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <filter id="blur" x="-2%" y="-2%" width="104%" height="104%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+  </defs>
+  <rect width="1920" height="1080" fill="#0E1114"/>
+  <image xlink:href="wallpaper.png" x="-20" y="-12" width="1960" height="1104" preserveAspectRatio="xMidYMid slice" filter="url(#blur)"/>
+  <rect width="1920" height="1080" fill="#000" opacity="0.3"/>
+</svg>

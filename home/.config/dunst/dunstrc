@@ -1,0 +1,35 @@
+# Dunst Majula
+[global]
+    origin = top-right
+    offset = (10, 46)
+    width = 320
+    height = (0, 140)
+    gap_size = 6
+    padding = 10
+    horizontal_padding = 12
+    frame_width = 1
+    frame_color = "#465056"
+    separator_color = frame
+    corner_radius = 10
+    font = Inter 10
+    markup = full
+    format = "<b>%s</b>\n%b"
+    icon_theme = Papirus-Dark
+    enable_recursive_icon_lookup = true
+    max_icon_size = 40
+    background = "#20272CF2"
+    foreground = "#DDD6C6"
+    highlight = "#D1A35C"
+    progress_bar_frame_width = 0
+    mouse_left_click = do_action, close_current
+
+[urgency_low]
+    foreground = "#A39B8C"
+    timeout = 4
+
+[urgency_normal]
+    timeout = 6
+
+[urgency_critical]
+    frame_color = "#E0783E"
+    timeout = 0

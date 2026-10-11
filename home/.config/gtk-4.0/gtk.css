@@ -1,0 +1,18 @@
+/* Majula colors for libadwaita apps (GTK4) */
+@define-color accent_color #D1A35C;
+@define-color accent_bg_color #D1A35C;
+@define-color accent_fg_color #0E1114;
+@define-color destructive_bg_color #C06452;
+@define-color success_color #87996D;
+@define-color warning_color #E0783E;
+@define-color error_color #C06452;
+@define-color window_bg_color #171C20;
+@define-color window_fg_color #DDD6C6;
+@define-color view_bg_color #0E1114;
+@define-color view_fg_color #DDD6C6;
+@define-color headerbar_bg_color #171C20;
+@define-color headerbar_fg_color #DDD6C6;
+@define-color sidebar_bg_color #171C20;
+@define-color card_bg_color #20272C;
+@define-color popover_bg_color #20272C;
+@define-color dialog_bg_color #20272C;

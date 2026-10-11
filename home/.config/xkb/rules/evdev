@@ -1,0 +1,5 @@
+! include %S/evdev
+
+// Custom option used by Hyprland (kb_options = "majula:keypad").
+! option = symbols
+  majula:keypad = +majula(keypad)

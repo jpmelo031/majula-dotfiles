@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
-  <g fill="none" stroke="#DDD6C6" stroke-linecap="round" stroke-width="2">
-    <path d="M3 8.5c4.5-4 11.5-4 16 0"/>
-    <path d="M6.5 12c2.6-2.4 6.4-2.4 9 0"/>
-  </g>
-  <circle cx="11" cy="16" r="1.6" fill="#DDD6C6"/>
-</svg>

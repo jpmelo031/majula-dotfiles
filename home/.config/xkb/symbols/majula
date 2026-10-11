@@ -1,0 +1,16 @@
+// The keypad stands in for the broken 5 and 6 keys of the number row.
+// Shift + keypad 1..0 gives the same symbols as the ABNT2 number row:
+// ! @ # $ % ¨ & * ( )   (always numeric, whatever the Num Lock state).
+partial keypad_keys
+xkb_symbols "keypad" {
+    key <KP1> { type = "TWO_LEVEL", [ KP_1, exclam ] };
+    key <KP2> { type = "TWO_LEVEL", [ KP_2, at ] };
+    key <KP3> { type = "TWO_LEVEL", [ KP_3, numbersign ] };
+    key <KP4> { type = "TWO_LEVEL", [ KP_4, dollar ] };
+    key <KP5> { type = "TWO_LEVEL", [ KP_5, percent ] };
+    key <KP6> { type = "TWO_LEVEL", [ KP_6, dead_diaeresis ] };
+    key <KP7> { type = "TWO_LEVEL", [ KP_7, ampersand ] };
+    key <KP8> { type = "TWO_LEVEL", [ KP_8, asterisk ] };
+    key <KP9> { type = "TWO_LEVEL", [ KP_9, parenleft ] };
+    key <KP0> { type = "TWO_LEVEL", [ KP_0, parenright ] };
+};

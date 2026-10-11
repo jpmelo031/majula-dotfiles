@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Screenshot: "area" (default) or "full". Saves to ~/Pictures/Screenshots and copies to the clipboard.
+set -euo pipefail
+
+dir="$HOME/Pictures/Screenshots"
+file="$dir/$(date +%Y-%m-%d_%H-%M-%S).png"
+mkdir -p "$dir"
+
+case "${1:-area}" in
+  area)
+    region=$(slurp -b 0E111488 -c E0783Eff -s D1A35C1a -w 2) || exit 0
+    grim -g "$region" "$file"
+    ;;
+  full)
+    grim "$file"
+    ;;
+  *)
+    echo "usage: ${0##*/} [area|full]" >&2
+    exit 2
+    ;;
+esac
+
+wl-copy < "$file"
+notify-send -a Screenshot -i "$file" "Screenshot saved and copied" "${file/#$HOME/\~}"

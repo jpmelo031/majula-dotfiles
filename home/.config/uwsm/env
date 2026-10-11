@@ -1,0 +1,4 @@
+# Session variables (read by UWSM at login)
+export QT_QPA_PLATFORMTHEME=qt6ct
+export XCURSOR_THEME=Adwaita
+export XCURSOR_SIZE=24
