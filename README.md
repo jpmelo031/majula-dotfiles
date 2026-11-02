@@ -39,7 +39,7 @@ The setup targets one notebook (Samsung 300E5M, 1366x768, Hyprland 0.56 with the
    ./install.sh
    ```
 
-3. Apply the parts that need root: the SDDM login theme, Num Lock from boot, the ABNT2 keymap, and the lid and hibernation rules.
+3. Apply the parts that need root: the SDDM login theme, Num Lock from boot, the ABNT2 keymap, Bluetooth, and the lid and hibernation rules.
 
    ```bash
    sudo bash system/apply-system.sh
@@ -72,6 +72,10 @@ The last three rows exist because the notebook's `5`, `6`, `F2` and `F5` keys ar
 ## Rice
 
 `rice` (or `Super + Shift + R`) opens fastfetch, btop, cava, tty-clock and cbonsai as neat panels on an empty workspace. Run it again to close them. Each panel also runs alone: `rice fetch`, `rice top`, `rice cava`, `rice clock` and `rice bonsai`. `pipes.sh` and `cmatrix` are installed too.
+
+## Bluetooth
+
+Click the Bluetooth icon in the bar (left of Wi-Fi) to connect or disconnect a paired device, or to turn Bluetooth on and off. Right-click it, or pick "Pair a new device", to open Blueman and pair something new.
 
 ## Idle
 

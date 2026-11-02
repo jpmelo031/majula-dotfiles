@@ -51,6 +51,12 @@ if command -v gsettings >/dev/null; then
   gsettings set org.gnome.desktop.interface monospace-font-name 'JetBrainsMono Nerd Font 10'
 fi
 
+echo "==> Bluetooth"
+# Waybar's bluetooth module is the bar icon, so blueman's own tray icon is turned off.
+if command -v gsettings >/dev/null && gsettings list-schemas | grep -qx org.blueman.general; then
+  gsettings set org.blueman.general plugin-list "['!StatusIcon', '!ShowConnected']"
+fi
+
 echo "==> VS Code theme"
 if command -v code >/dev/null; then
   vsix="$(mktemp -d)/majula-theme.vsix"

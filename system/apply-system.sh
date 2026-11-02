@@ -45,6 +45,9 @@ CONF
 systemctl daemon-reload
 systemctl enable numlock.service
 
+echo "==> Bluetooth on from boot"
+systemctl enable --now bluetooth.service
+
 echo "==> Never hibernate; closing the lid only locks the screen"
 install -d /etc/systemd/logind.conf.d
 cat > /etc/systemd/logind.conf.d/10-majula.conf <<'CONF'

@@ -10,7 +10,7 @@
 
     "modules-left": ["custom/launcher", "hyprland/workspaces", "hyprland/window"],
     "modules-center": ["clock"],
-    "modules-right": ["tray", "backlight", "pulseaudio", "custom/power"],
+    "modules-right": ["bluetooth", "tray", "backlight", "pulseaudio", "custom/power"],
 
     "custom/launcher": {
         "format": "",
@@ -43,6 +43,22 @@
                 "today": "<span color='#E0783E'><b>{}</b></span>"
             }
         }
+    },
+
+    "bluetooth": {
+        "format": "󰂯",
+        "format-connected": "󰂱",
+        "format-off": "󰂲",
+        "format-disabled": "󰂲",
+        "format-no-controller": "",
+        "tooltip-format": "Bluetooth on",
+        "tooltip-format-off": "Bluetooth off",
+        "tooltip-format-disabled": "Bluetooth off",
+        "tooltip-format-connected": "{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}",
+        "tooltip-format-enumerate-connected-battery": "{device_alias}  {device_battery_percentage}%",
+        "on-click": "~/.config/hypr/scripts/bluetooth-menu",
+        "on-click-right": "uwsm app -- blueman-manager"
     },
 
     "tray": {

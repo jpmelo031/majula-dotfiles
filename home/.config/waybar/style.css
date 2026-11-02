@@ -51,6 +51,21 @@ tooltip label {
     color: @ember;
 }
 
+#bluetooth {
+    font-family: "JetBrainsMono Nerd Font";
+    font-size: 14px;
+    padding: 0 4px 0 9px;
+}
+
+#bluetooth.connected {
+    color: @accent;
+}
+
+#bluetooth.off,
+#bluetooth.disabled {
+    color: @muted;
+}
+
 #workspaces {
     margin: 4px 0;
 }

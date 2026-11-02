@@ -85,7 +85,7 @@ hl.layer_rule({
 
 hl.window_rule({
     name   = "majula-float-tools",
-    match  = { class = "^(org.pulseaudio.pavucontrol|nm-connection-editor|qt6ct)$" },
+    match  = { class = "^(org.pulseaudio.pavucontrol|nm-connection-editor|blueman-manager|qt6ct)$" },
     float  = true,
     size   = "760 480",
     center = true,
@@ -95,7 +95,8 @@ hl.window_rule({
 ---- AUTOSTART ----
 -------------------
 
--- nm-applet and dunst start on their own (XDG autostart / D-Bus).
+-- nm-applet, blueman-applet and dunst start on their own (XDG autostart / D-Bus).
+-- blueman's own tray icon is turned off by install.sh; Waybar's bluetooth module replaces it.
 hl.on("hyprland.start", function()
     hl.exec_cmd("uwsm app -- waybar")
     hl.exec_cmd("uwsm app -- hyprpaper")

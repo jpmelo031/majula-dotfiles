@@ -15,6 +15,9 @@ rofi
 dunst
 libnotify
 network-manager-applet
+bluez
+bluez-utils
+blueman
 cliphist
 wl-clipboard
 grim
