@@ -112,10 +112,17 @@ Step 'Privacy: no advertising ID, tailored experiences, feedback prompts or tele
 Step 'Taskbar and Explorer: no Widgets or Task View, search as an icon, file extensions shown' {
     Set-Reg $adv 'HideFileExt' 0
     Set-Reg $adv 'LaunchTo' 1   # Explorer opens on This PC
-    Set-Reg 'HKLM:\SOFTWARE\Policies\Microsoft\Dsh' 'AllowNewsAndInterests' 0
     Set-Reg $adv 'ShowTaskViewButton' 0
-    # Last: some Windows builds protect this one.
-    Set-Reg 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Search' 'SearchboxTaskbarMode' 1
+    # Some Windows builds protect this one.
+    try { Set-Reg 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Search' 'SearchboxTaskbarMode' 1 }
+    catch { Write-Host '    search icon: Windows blocks this setting here; pick it in Settings > Personalization > Taskbar' -ForegroundColor DarkYellow }
+    # Windows blocks scripts from writing the Widgets policy, even as admin ("unauthorized
+    # operation", from the UCPD driver), and LTSC has no Widgets at all. Only try it when
+    # Widgets is installed, and never let it stop the rest of this step.
+    if (Get-AppxPackage -AllUsers -Name 'MicrosoftWindows.Client.WebExperience') {
+        try { Set-Reg 'HKLM:\SOFTWARE\Policies\Microsoft\Dsh' 'AllowNewsAndInterests' 0 }
+        catch { Write-Host '    Widgets: Windows blocks this setting for scripts; turn Widgets off in Settings > Personalization > Taskbar' -ForegroundColor DarkYellow }
+    }
 }
 
 Step 'Removing preinstalled extras (only the ones that are there)' {
@@ -147,8 +154,12 @@ Step 'Removing preinstalled extras (only the ones that are there)' {
 }
 
 Step 'Cleaning temporary files and old update files (takes a few minutes)' {
+    # Only what is older than a day: programs that are running keep their working files here,
+    # and deleting those from under them breaks them.
+    $cutoff = (Get-Date).AddDays(-1)
     foreach ($dir in $env:TEMP, (Join-Path $env:WINDIR 'Temp')) {
         Get-ChildItem $dir -Force -ErrorAction SilentlyContinue |
+            Where-Object { $_.LastWriteTime -lt $cutoff } |
             Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
     }
     Run Dism.exe /Online /Cleanup-Image /StartComponentCleanup /NoRestart
