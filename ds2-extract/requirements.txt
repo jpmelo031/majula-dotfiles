@@ -1,0 +1,5 @@
+pillow>=11
+numpy>=2
+cryptography>=44
+fonttools>=4.55
+potracer>=0.0.4

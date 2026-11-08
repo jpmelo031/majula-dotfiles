@@ -75,10 +75,10 @@ hl.config({
     },
 })
 
--- Blur behind the bar, the launcher and notifications.
+-- Blur behind the bar and notifications.
 hl.layer_rule({
     name  = "majula-blur",
-    match = { namespace = "^(waybar|rofi|notifications)$" },
+    match = { namespace = "^(waybar|notifications)$" },
     blur  = true,
     ignore_alpha = 0.2,
 })
@@ -95,13 +95,17 @@ hl.window_rule({
 ---- AUTOSTART ----
 -------------------
 
--- nm-applet, blueman-applet and dunst start on their own (XDG autostart / D-Bus).
+-- nm-applet and blueman-applet start on their own (XDG autostart).
 -- blueman's own tray icon is turned off by install.sh; Waybar's bluetooth module replaces it.
 hl.on("hyprland.start", function()
+    hl.exec_cmd("uwsm app -- swaync")   -- notifications, styled like the game's messages
     hl.exec_cmd("uwsm app -- waybar")
     hl.exec_cmd("uwsm app -- hyprpaper")
     hl.exec_cmd("uwsm app -- hypridle")
     hl.exec_cmd("uwsm app -- wl-paste --watch cliphist store")
+    -- Sound effects in the background: mono + EQ for the headset, flat for the speakers.
+    -- Started without its window; open it from Attune spells or the app list.
+    hl.exec_cmd("command -v easyeffects >/dev/null && uwsm app -- easyeffects --service-mode --hide-window")
     hl.exec_cmd("uwsm app -- /usr/lib/polkit-kde-authentication-agent-1")
 end)
 
@@ -109,15 +113,16 @@ end)
 ---- KEYBINDS ----
 ------------------
 
--- Super+R opens the app launcher (it used to be rofi -show run).
+-- Super+R opens the bonfire menu (Dark Souls II style): Travel (apps), Attune spells (sound),
+-- Burn (session) and Item box (clipboard). Pressing it again closes the menu.
 hl.unbind(mainMod .. " + R")
-hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("rofi -show drun"))
+hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(scripts .. "bonfire"))
 
 hl.bind(mainMod .. " + B",          hl.dsp.exec_cmd("zen-browser"))
 hl.bind(mainMod .. " + F",          hl.dsp.window.fullscreen())
 hl.bind(mainMod .. " + L",          hl.dsp.exec_cmd("loginctl lock-session"))
-hl.bind(mainMod .. " + ESCAPE",     hl.dsp.exec_cmd(scripts .. "power-menu"))
-hl.bind(mainMod .. " + SHIFT + V",  hl.dsp.exec_cmd(scripts .. "clipboard"))
+hl.bind(mainMod .. " + ESCAPE",     hl.dsp.exec_cmd(scripts .. "bonfire burn"))
+hl.bind(mainMod .. " + SHIFT + V",  hl.dsp.exec_cmd(scripts .. "bonfire items"))
 hl.bind("PRINT",                    hl.dsp.exec_cmd(scripts .. "screenshot area"))
 hl.bind("SHIFT + PRINT",            hl.dsp.exec_cmd(scripts .. "screenshot full"))
 hl.bind(mainMod .. " + SHIFT + R",  hl.dsp.exec_cmd(scripts .. "rice"))   -- rice showcase (again = close)

@@ -1,9 +1,9 @@
-/* Rofi Majula */
+/* Rofi Majula: the bonfire theme when the DS2 art is built (see install.sh), else majula */
 
 configuration {
     modi: "drun,run,window";
     show-icons: true;
-    icon-theme: "Papirus-Dark";
+    icon-theme: "Papirus-Dark-Majula";
     drun-display-format: "{name}";
     display-drun: "";
     display-run: "";
@@ -14,4 +14,4 @@ configuration {
     me-accept-entry: "MousePrimary";
 }
 
-@theme "majula"
+@theme "bonfire"

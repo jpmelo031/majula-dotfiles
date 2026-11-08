@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Runs the DS2 extractor in its own Python environment (created on first run).
+set -euo pipefail
+here="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+venv="$here/.venv"
+if [[ ! -x $venv/bin/python ]] || ! "$venv/bin/python" -c 'import PIL, numpy, cryptography, fontTools, potrace, fsb5' 2>/dev/null; then
+  echo "==> Setting up the Python environment (first run only)"
+  python3 -m venv "$venv"
+  "$venv/bin/pip" install --quiet --disable-pip-version-check -r "$here/requirements.txt"
+fi
+cd "$here"
+exec "$venv/bin/python" -m ds2extract "$@"

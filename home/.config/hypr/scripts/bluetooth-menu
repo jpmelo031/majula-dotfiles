@@ -4,14 +4,13 @@
 set -euo pipefail
 
 menu() {
-  rofi -dmenu -i -format i -p "󰂯" \
-    -theme-str "window { width: 320px; } listview { lines: $1; } inputbar { enabled: false; }"
+  rofi -dmenu -i -no-custom -format i -theme-str 'entry { placeholder: "Bluetooth"; }'
 }
 
 pair() { setsid -f uwsm app -- blueman-manager >/dev/null 2>&1; }
 
 if ! bluetoothctl show | grep -q 'Powered: yes'; then
-  choice=$(printf '%s\n' "󰂯  Turn on Bluetooth" "󰂰  Pair a new device" | menu 2) || exit 0
+  choice=$(printf '%s\n' "Turn on Bluetooth" "Pair a new device" | menu) || exit 0
   case "$choice" in
     0) rfkill unblock bluetooth 2>/dev/null || true
        bluetoothctl power on >/dev/null ;;
@@ -26,14 +25,14 @@ while read -r _ mac name; do
   macs+=("$mac")
   names+=("$name")
   if grep -qx "$mac" <<< "$connected"; then
-    lines+=("󰂱  $name  (connected)")
+    lines+=("$name (connected)")
   else
-    lines+=("󰂯  $name")
+    lines+=("$name")
   fi
 done < <(bluetoothctl devices Paired)
-lines+=("󰂰  Pair a new device" "󰂲  Turn off Bluetooth")
+lines+=("Pair a new device" "Turn off Bluetooth")
 
-choice=$(printf '%s\n' "${lines[@]}" | menu "${#lines[@]}") || exit 0
+choice=$(printf '%s\n' "${lines[@]}" | menu) || exit 0
 [[ $choice =~ ^[0-9]+$ ]] || exit 0   # typed text that matched nothing
 n=${#macs[@]}
 

@@ -235,4 +235,12 @@ Rectangle {
     }
 
     Component.onCompleted: password.forceActiveFocus()
+
+    // Fades in from black, where the boot screen left off.
+    Rectangle {
+        anchors.fill: parent
+        color: "black"
+        z: 100
+        NumberAnimation on opacity { from: 1; to: 0; duration: 700; easing.type: Easing.InOutQuad }
+    }
 }

@@ -12,7 +12,7 @@ hyprpaper
 hypridle
 hyprlock
 rofi
-dunst
+swaync
 libnotify
 network-manager-applet
 bluez
@@ -23,12 +23,18 @@ wl-clipboard
 grim
 slurp
 brightnessctl
+plymouth
+efibootmgr
 playerctl
 pavucontrol
+easyeffects
+lsp-plugins-lv2
+calf
 # Apps
 kitty
 dolphin
 qt6ct
+kvantum
 # Look
 papirus-icon-theme
 ttf-jetbrains-mono-nerd
@@ -42,3 +48,5 @@ cmatrix
 # Used by the scripts
 python
 librsvg
+python-gobject
+gtk-layer-shell

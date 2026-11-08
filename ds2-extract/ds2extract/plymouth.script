@@ -1,0 +1,82 @@
+# Majula DS2: the Dark Souls II loading screen, built by ds2-extract.
+# Everything is laid out for 1366x768 and scaled to the screen's height.
+# The screen fades in from black, the item a moment later, like in the game. Before the
+# login screen, plymouth-quit tells it "majula-fade-out" and it fades back to black.
+
+Window.SetBackgroundTopColor(0, 0, 0);
+Window.SetBackgroundBottomColor(0, 0, 0);
+
+scale = Window.GetHeight() / 768;
+origin = Window.GetWidth() - 1366 * scale;
+
+fun load(path) {
+    img = Image(path);
+    if (global.scale != 1)
+        img = img.Scale(Math.Int(img.GetWidth() * global.scale + 0.5),
+                        Math.Int(img.GetHeight() * global.scale + 0.5));
+    return img;
+}
+
+fun place(path, x, y, z) {
+    spr = Sprite(load(path));
+    spr.SetPosition(global.origin + x * global.scale, y * global.scale, z);
+    spr.SetOpacity(0);
+    return spr;
+}
+
+background = place("background.png", 0, 0, -10);
+logo = place("logo.png", @LOGO_X@, @LOGO_Y@, 1);
+
+for (i = 0; i < 32; i++)
+    frames[i] = load("bonfire/" + i + ".png");
+bonfire = Sprite(frames[0]);
+bonfire.SetPosition(origin + @BONFIRE_X@ * scale, @BONFIRE_Y@ * scale, 1);
+bonfire.SetOpacity(0);
+
+# One random item per boot. Plymouth seeds Math.Random() from the clock, but on 64-bit
+# systems it only returns values below 2^-32 (a 31-bit number divided by LONG_MAX), so
+# scale that back up to 0..1 first.
+r = Math.Random();
+if (r * 1000000 < 1)
+    r = r * 8589934592;
+pick = Math.Int(r * @ITEMS@);
+if (pick >= @ITEMS@) pick = @ITEMS@ - 1;
+item = place("items/" + pick + ".png", @BLOCK_X@, @BLOCK_Y@, 2);
+
+# The refresh function runs 50 times a second.
+FADE = 30;            # ticks a fade takes (0.6 s)
+ITEM_DELAY = 20;      # the item starts fading in this many ticks after the background
+tick = 0;
+fade_out_at = -1;
+
+fun ramp(t) {
+    if (t <= 0) return 0;
+    if (t >= 1) return 1;
+    return t * t * (3 - 2 * t);    # smoothstep
+}
+
+fun refresh() {
+    global.tick = global.tick + 1;
+    f = Math.Int(global.tick / 3);
+    f = f - Math.Int(f / 32) * 32;
+    global.bonfire.SetImage(global.frames[f]);
+
+    scene = ramp(global.tick / global.FADE);
+    shown = ramp((global.tick - global.ITEM_DELAY) / global.FADE);
+    if (global.fade_out_at >= 0) {
+        out = 1 - ramp((global.tick - global.fade_out_at) / global.FADE);
+        scene = Math.Min(scene, out);
+        shown = Math.Min(shown, out);
+    }
+    global.background.SetOpacity(scene);
+    global.logo.SetOpacity(scene);
+    global.bonfire.SetOpacity(scene);
+    global.item.SetOpacity(shown);
+}
+Plymouth.SetRefreshFunction(refresh);
+
+fun status(text) {
+    if (text == "majula-fade-out" && global.fade_out_at < 0)
+        global.fade_out_at = global.tick;
+}
+Plymouth.SetUpdateStatusFunction(status);

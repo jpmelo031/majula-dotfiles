@@ -1,0 +1,74 @@
+/* Rofi bonfire: the Dark Souls II bonfire menu.
+ * The window art and the Drangleic font are built from your copy of the game by
+ * ds2-extract (see ds2-extract/README.md); install.sh copies them into place.
+ * Sizes are pixel-matched to the game at 1366x768: 11 rows of 29 px. */
+
+* {
+    text: #C5C0BC;
+    font: "Drangleic 24px";
+    background-color: transparent;
+    text-color: @text;
+}
+
+window {
+    width: 448px;
+    height: 504px;
+    location: center;
+    anchor: center;
+    border: 0;
+    padding: 0;
+    background-color: transparent;
+    background-image: url("~/.config/rofi/ds2/window.png", none);
+}
+
+mainbox {
+    padding: 0;
+    spacing: 0;
+    children: [ "inputbar", "listview" ];
+}
+
+/* The title band: shows the menu name, or what you type to filter. */
+inputbar {
+    margin: 24px 34px 0 30px;
+    padding: 13px 0 16px 0;
+    children: [ "entry" ];
+}
+
+entry {
+    font: "Drangleic 26px";
+    horizontal-align: 0.5;
+    vertical-align: 0.5;
+    placeholder: "Majula";
+    placeholder-color: @text;
+    cursor-width: 0;
+    expand: true;
+}
+
+listview {
+    margin: 52px 51px 0 39px;
+    lines: 11;
+    fixed-height: true;
+    spacing: 0;
+    scrollbar: false;
+    expand: false;              /* exactly 11 rows, even with a long list */
+}
+
+element {
+    padding: 1px 0 2px 7px;
+    children: [ "element-text" ];
+}
+
+element-text {
+    vertical-align: 0.5;
+}
+
+element normal.normal, element alternate.normal,
+element normal.active, element alternate.active,
+element normal.urgent, element alternate.urgent {
+    background-color: transparent;
+}
+
+element selected.normal, element selected.active, element selected.urgent {
+    background-color: transparent;
+    background-image: url("~/.config/rofi/ds2/selected.png", none);
+}

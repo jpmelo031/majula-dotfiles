@@ -135,10 +135,10 @@ inactiveBackground=14,17,20
 inactiveForeground=163,155,140
 
 [Icons]
-Theme=Papirus-Dark
+Theme=Papirus-Dark-Majula
 
 [KDE]
-widgetStyle=Fusion
+widgetStyle=kvantum
 
 [UiSettings]
 ColorScheme=Majula

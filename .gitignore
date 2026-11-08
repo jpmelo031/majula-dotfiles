@@ -1,0 +1,4 @@
+# Built from your own copy of Dark Souls II by ds2-extract/extract; never committed.
+/ds2-assets/
+/ds2-extract/.venv/
+__pycache__/

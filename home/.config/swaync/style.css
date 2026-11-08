@@ -1,0 +1,116 @@
+/* Notifications in Dark Souls II style: the in-game menus' torn dark leather (built from
+ * your copy of the game by ds2-extract into ./ds2/) and the Drangleic font. Without the
+ * game art they fall back to plain dark panels. Structure comes from swaync's own style. */
+@import url("file:///etc/xdg/swaync/style.css");
+
+:root {
+  --text-color: #C5C0BC;
+  --text-color-disabled: #8C8578;
+  --noti-bg-hover: rgba(224, 120, 62, 0.10);
+  --noti-bg-focus: rgba(224, 120, 62, 0.08);
+  --border-radius: 0px;
+  --notification-icon-size: 44px;
+  --font-size-summary: 18px;
+  --font-size-body: 15px;
+}
+
+* {
+  font-family: "Drangleic", "Inter", sans-serif;
+}
+
+/* Each message: the leather panel with its torn edges. */
+.notification-row .notification-background .notification,
+.control-center {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background-color: transparent;
+  background-image: url("ds2/leather.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.notification-row .notification-background .notification {
+  padding: 10px 14px;
+}
+
+.notification-row .notification-background .notification .notification-default-action {
+  border-radius: 0;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .summary {
+  color: #D8CFC2;
+  font-size: var(--font-size-summary);
+  font-weight: normal;
+  letter-spacing: 0.5px;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .body {
+  color: #A39B8C;
+  font-size: var(--font-size-body);
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .time {
+  color: #8C8578;
+  font-size: 12px;
+}
+
+/* Urgent messages glow like the bonfire menu's selected row. */
+.notification-row .notification-background .notification.critical .notification-default-action .notification-content .text-box .summary {
+  color: #E0783E;
+}
+
+.notification-row .notification-background .notification.critical {
+  box-shadow: inset 0 0 0 1px rgba(224, 120, 62, 0.55), 0 0 8px rgba(224, 120, 62, 0.35);
+}
+
+.close-button {
+  background: transparent;
+  color: #A39B8C;
+  box-shadow: none;
+  border: none;
+}
+
+.close-button:hover {
+  background: rgba(224, 120, 62, 0.15);
+  color: #E0783E;
+}
+
+.notification-row .notification-background .notification .notification-action > button {
+  background: rgba(0, 0, 0, 0.35);
+  color: #C5C0BC;
+  border: 1px solid rgba(117, 93, 74, 0.8);
+  border-radius: 0;
+}
+
+.notification-row .notification-background .notification .notification-action > button:hover {
+  background: rgba(224, 120, 62, 0.15);
+  border-color: #E0783E;
+}
+
+.control-center {
+  padding: 16px 18px;
+}
+
+.control-center .control-center-list .notification {
+  background-image: none;
+  background-color: rgba(0, 0, 0, 0.25);
+  box-shadow: inset 0 -1px 0 rgba(117, 93, 74, 0.6);
+}
+
+.widget-title > label {
+  color: #D8CFC2;
+  font-size: 22px;
+}
+
+.widget-title > button,
+.widget-dnd switch {
+  border-radius: 0;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(117, 93, 74, 0.8);
+  color: #C5C0BC;
+}
+
+.widget-dnd switch:checked {
+  background: rgba(224, 120, 62, 0.45);
+}

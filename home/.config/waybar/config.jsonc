@@ -15,7 +15,7 @@
     "custom/launcher": {
         "format": "",
         "tooltip": false,
-        "on-click": "rofi -show drun"
+        "on-click": "~/.config/hypr/scripts/bonfire"
     },
 
     "hyprland/workspaces": {
@@ -67,7 +67,8 @@
     },
 
     "backlight": {
-        "format": "{icon} {percent}%",
+        // The icon (and the space after it) in the Nerd Font, the number in Drangleic.
+        "format": "<span font_family='JetBrainsMono Nerd Font'>{icon} </span>{percent}%",
         "format-icons": ["󰃞", "󰃟", "󰃠"],
         "on-scroll-up": "brightnessctl -e4 -n2 set 2%+",
         "on-scroll-down": "brightnessctl -e4 -n2 set 2%-",
@@ -75,8 +76,8 @@
     },
 
     "pulseaudio": {
-        "format": "{icon} {volume}%",
-        "format-muted": "󰝟 muted",
+        "format": "<span font_family='JetBrainsMono Nerd Font'>{icon} </span>{volume}%",
+        "format-muted": "<span font_family='JetBrainsMono Nerd Font'>󰝟 </span>muted",
         "format-icons": { "default": ["󰕿", "󰖀", "󰕾"], "headphone": "󰋋" },
         "scroll-step": 5,
         "smooth-scrolling-threshold": 2,
@@ -87,6 +88,6 @@
     "custom/power": {
         "format": "󰐥",
         "tooltip": false,
-        "on-click": "~/.config/hypr/scripts/power-menu"
+        "on-click": "~/.config/hypr/scripts/bonfire burn"
     }
 }

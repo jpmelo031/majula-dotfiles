@@ -1,0 +1,305 @@
+#!/usr/bin/env python3
+"""The bonfire: a Dark Souls II style menu in Rofi.
+
+  bonfire           Majula: Travel, Attune spells, Burn, Item box
+  bonfire travel    apps, grouped by category like areas on the travel list
+  bonfire attune    sound: equalizer, presets and bypass (EasyEffects)
+  bonfire burn      lock, log out, suspend, reboot, shut down
+  bonfire items     clipboard history
+
+Esc goes back one menu, like B in the game. Typing filters the list; on the first
+menu, typing an app name that matches nothing there searches all apps instead.
+"""
+import configparser
+import os
+import shlex
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+HOME = Path.home()
+WINDOWS = Path("/usr/local/bin/reboot-to-windows")
+
+# Freedesktop main categories, grouped into the "areas" shown under Travel.
+AREAS = [
+    ("Games", {"Game"}),
+    ("Internet", {"Network", "WebBrowser", "Email", "Chat"}),
+    ("Development", {"Development", "IDE"}),
+    ("Multimedia", {"AudioVideo", "Audio", "Video", "Player"}),
+    ("Graphics", {"Graphics", "Photography"}),
+    ("Office", {"Office", "TextEditor", "WordProcessor"}),
+    ("Education", {"Education", "Science"}),
+    ("Settings", {"Settings", "DesktopSettings", "HardwareSettings"}),
+    ("System", {"System", "TerminalEmulator", "FileManager", "Monitor"}),
+    ("Utilities", {"Utility", "Archiving", "Accessibility"}),
+]
+
+
+def menu(title, entries, selected=0, custom=False, columns=None):
+    """Shows a list; returns the chosen index, the typed text (custom=True), or None on Esc."""
+    title = title.replace('"', "'")
+    args = ["rofi", "-dmenu", "-i", "-format", "i:f", "-selected-row", str(selected),
+            "-theme-str", f'entry {{ placeholder: "{title}"; }}']
+    if not custom:
+        args.append("-no-custom")
+    if columns:
+        args += ["-display-columns", columns]
+    r = subprocess.run(args, input="\n".join(entries), capture_output=True, text=True)
+    if r.returncode != 0 or not r.stdout.strip():
+        return None
+    index, _, text = r.stdout.rstrip("\n").partition(":")
+    index = int(index)
+    if index < 0:
+        return text if custom and text else None
+    return index
+
+
+def run(*cmd):
+    subprocess.Popen(cmd, start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+def notify(text):
+    if shutil.which("notify-send"):
+        run("notify-send", "-a", "Bonfire", text)
+
+
+# ---------------------------------------------------------------- Travel (apps)
+
+def desktop_dirs():
+    data_home = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share"))
+    data_dirs = os.environ.get("XDG_DATA_DIRS", "/usr/local/share:/usr/share").split(":")
+    return [data_home / "applications"] + [Path(d) / "applications" for d in data_dirs if d]
+
+
+def program(exec_line):
+    """The program an Exec= line runs, with links resolved (to spot the same app twice)."""
+    try:
+        args = shlex.split(exec_line)
+    except ValueError:
+        return exec_line
+    while args and (args[0] == "env" or "=" in args[0]):
+        args.pop(0)
+    if not args:
+        return exec_line
+    path = shutil.which(args[0]) or args[0]
+    return os.path.realpath(path)
+
+
+def apps():
+    """Visible desktop apps as {desktop id: (name, categories)}; earlier dirs win.
+
+    An app listed twice under different ids (TeamSpeak writes its own copy of its entry
+    to ~/.local/share/applications) is shown once: same name and same program.
+    """
+    desktops = set(os.environ.get("XDG_CURRENT_DESKTOP", "Hyprland").split(":"))
+    found, seen = {}, set()
+    for base in desktop_dirs():
+        if not base.is_dir():
+            continue
+        for path in sorted(base.rglob("*.desktop")):
+            app_id = str(path.relative_to(base)).replace("/", "-")
+            if app_id in found:
+                continue
+            cp = configparser.ConfigParser(interpolation=None, strict=False)
+            cp.optionxform = str
+            try:
+                cp.read(path, encoding="utf-8")
+                e = cp["Desktop Entry"]
+            except (configparser.Error, KeyError, UnicodeDecodeError):
+                found[app_id] = None
+                continue
+            hidden = (e.get("Type") != "Application" or e.get("NoDisplay") == "true"
+                      or e.get("Hidden") == "true"
+                      or (e.get("OnlyShowIn") and not desktops & set(e["OnlyShowIn"].split(";")))
+                      or desktops & set(e.get("NotShowIn", "").split(";"))
+                      or (e.get("TryExec") and not shutil.which(e["TryExec"])))
+            name = e.get("Name", app_id[:-8])
+            same = (name, program(e.get("Exec", "")))
+            if not hidden and same in seen:
+                hidden = True
+            seen.add(same)
+            found[app_id] = None if hidden else (name, set(e.get("Categories", "").split(";")))
+    return {k: v for k, v in found.items() if v}
+
+
+def areas():
+    """[(area, [(name, desktop id)])], each app in the first area that fits, the rest in Other."""
+    groups = {name: [] for name, _ in AREAS}
+    groups["Other"] = []
+    for app_id, (name, cats) in apps().items():
+        area = next((a for a, keys in AREAS if cats & keys), "Other")
+        groups[area].append((name, app_id))
+    return [(a, sorted(lst, key=lambda x: x[0].lower())) for a, lst in groups.items() if lst]
+
+
+def launch(app_id):
+    run("uwsm", "app", "--", app_id)
+
+
+def pick_app(title, entries, query=None):
+    names = [n for n, _ in entries]
+    if query:
+        r = subprocess.run(["rofi", "-dmenu", "-i", "-format", "i", "-no-custom", "-filter", query,
+                            "-theme-str", f'entry {{ placeholder: "{title}"; }}'],
+                           input="\n".join(names), capture_output=True, text=True)
+        i = int(r.stdout) if r.returncode == 0 and r.stdout.strip() else None
+    else:
+        i = menu(title, names)
+    if i is None:
+        return False
+    launch(entries[i][1])
+    return True
+
+
+def travel():
+    groups = areas()
+    entries = [a for a, _ in groups] + (["Drangleic (Windows)"] if WINDOWS.exists() else [])
+    sel = 0
+    while True:
+        i = menu("Travel", entries, sel)
+        if i is None:
+            return False
+        sel = i
+        if i == len(groups):
+            if menu("Travel to Windows?", ["Yes", "No"], 1) == 0:
+                run("sudo", "-n", str(WINDOWS))
+                return True
+            continue
+        area, entries_in_area = groups[i]
+        if pick_app(area, entries_in_area):
+            return True
+
+
+def search(query):
+    everything = sorted(((n, i) for i, (n, _) in apps().items()), key=lambda x: x[0].lower())
+    return pick_app("Travel", everything, query)
+
+
+# ---------------------------------------------------------- Attune spells (sound)
+
+def easyeffects(*args):
+    return subprocess.run(["easyeffects", *args], capture_output=True, text=True)
+
+
+def presets():
+    """Output preset names from `easyeffects --presets` ("Output presets:" then "1<TAB>name" lines)."""
+    names, section = [], None
+    for line in easyeffects("--presets").stdout.splitlines():
+        if line.strip().endswith("presets:"):
+            section = line.strip().lower()
+        elif section == "output presets:" and "\t" in line:
+            names.append(line.split("\t", 1)[1].strip())
+    return names
+
+
+def attune():
+    if not shutil.which("easyeffects"):
+        notify("EasyEffects is not installed (sudo pacman -S easyeffects lsp-plugins-lv2 calf).")
+        return False
+    sel = 0
+    while True:
+        i = menu("Attune spells", ["Equalizer", "Presets", "Bypass effects"], sel)
+        if i is None:
+            return False
+        sel = i
+        if i == 0:
+            run("uwsm", "app", "--", "com.github.wwmm.easyeffects.desktop")
+            return True
+        if i == 1:
+            names = presets()
+            if not names:
+                notify("No presets yet. Save one in the equalizer first.")
+                continue
+            j = menu("Presets", names)
+            if j is not None:
+                easyeffects("--load-preset", names[j])
+                notify(f"Attuned: {names[j]}")
+                return True
+        if i == 2:
+            easyeffects("--bypass-toggle")
+            notify("Effects bypass toggled")
+            return True
+
+
+# --------------------------------------------------------------- Burn (session)
+
+def burn():
+    entries = ["Lock", "Log out", "Suspend", "Reboot", "Shut down"]
+    if WINDOWS.exists():
+        entries.insert(4, "Reboot into Windows")
+    i = menu("Burn", entries)
+    if i is None:
+        return False
+    action = entries[i]
+    commands = {
+        "Lock": ["loginctl", "lock-session"],
+        "Log out": ["uwsm", "stop"],
+        "Suspend": ["systemctl", "suspend"],
+        "Reboot": ["systemctl", "reboot"],
+        "Reboot into Windows": ["sudo", "-n", str(WINDOWS)],
+        "Shut down": ["systemctl", "poweroff"],
+    }
+    run(*commands[action])
+    return True
+
+
+# ------------------------------------------------------------ Item box (clipboard)
+
+def item_box():
+    if not shutil.which("cliphist"):
+        return False
+    history = subprocess.run(["cliphist", "list"], capture_output=True, text=True).stdout.splitlines()
+    if not history:
+        notify("The item box is empty.")
+        return False
+    i = menu("Item box", history, columns="2")
+    if i is None:
+        return False
+    data = subprocess.run(["cliphist", "decode"], input=history[i].encode(), capture_output=True).stdout
+    subprocess.run(["wl-copy"], input=data)
+    return True
+
+
+# ------------------------------------------------------------------------ Majula
+
+def majula():
+    actions = [travel, attune, burn, item_box]
+    sel = 0
+    while True:
+        i = menu("Majula", ["Travel", "Attune spells", "Burn", "Item box"], sel, custom=True)
+        if i is None:
+            return
+        if isinstance(i, str):        # typed something that is not a menu entry: search apps
+            if search(i):
+                return
+            continue
+        sel = i
+        if actions[i]():
+            return
+
+
+def already_open():
+    """Pressing the key again closes the menu: ends the running bonfire and its rofi."""
+    pidfile = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp")) / "bonfire.pid"
+    try:
+        pid = int(pidfile.read_text())
+        if Path(f"/proc/{pid}/cmdline").read_bytes().find(b"bonfire") >= 0:
+            os.kill(pid, 15)
+            subprocess.run(["pkill", "-x", "rofi"])
+            return True
+    except (OSError, ValueError):
+        pass
+    pidfile.write_text(str(os.getpid()))
+    return False
+
+
+def main():
+    if already_open():
+        return
+    what = sys.argv[1] if len(sys.argv) > 1 else ""
+    {"": majula, "travel": travel, "attune": attune, "burn": burn, "items": item_box}.get(what, majula)()
+
+
+if __name__ == "__main__":
+    main()

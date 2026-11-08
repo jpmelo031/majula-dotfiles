@@ -11,8 +11,9 @@
 @define-color danger     #C06452;
 
 * {
-    font-family: "Inter", "JetBrainsMono Nerd Font", sans-serif;
-    font-size: 12.5px;
+    /* Drangleic: the Dark Souls II menu font (ds2-extract); icons come from the Nerd Font. */
+    font-family: "Drangleic", "Inter", "JetBrainsMono Nerd Font", sans-serif;
+    font-size: 15px;
     min-height: 0;
     border: none;
     border-radius: 0;
@@ -86,7 +87,6 @@ tooltip label {
 #workspaces button.active {
     background: @accent;
     color: @background;
-    font-weight: 600;
 }
 
 #workspaces button.urgent {
@@ -116,7 +116,6 @@ window#waybar.empty #window {
 
 #clock {
     padding: 0 12px;
-    font-weight: 600;
     letter-spacing: 0.5px;
 }
 
@@ -124,11 +123,6 @@ window#waybar.empty #window {
 #backlight,
 #pulseaudio {
     padding: 0 9px;
-}
-
-#backlight,
-#pulseaudio {
-    font-family: "JetBrainsMono Nerd Font", "Inter";
 }
 
 #pulseaudio.muted {
