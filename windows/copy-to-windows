@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+# Puts the Majula kit for Windows in a "Majula" folder on the Windows desktop, from Arch.
+# Usage: sudo bash windows/copy-to-windows
+# Then, in Windows, run "1 - Majula theme" and "2 - Performance and cleanup" from that folder.
+# Needs the DS2 art (ds2-extract/extract) for the cursor and the game font.
+set -euo pipefail
+[[ $EUID -eq 0 ]] || { echo "Run it with sudo: sudo bash $0" >&2; exit 1; }
+here="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+repo="$(dirname -- "$here")"
+build="$repo/ds2-assets/build"
+nerd=/usr/share/fonts/TTF
+for f in "$build/windows/Drangleic.cur" "$build/fonts/Drangleic.otf"; do
+  [[ -f $f ]] || { echo "Missing $f: run ds2-extract/extract first" >&2; exit 1; }
+done
+[[ -f $nerd/JetBrainsMonoNerdFont-Regular.ttf ]] ||
+  { echo "JetBrainsMono Nerd Font not found in $nerd (sudo pacman -S ttf-jetbrains-mono-nerd)" >&2; exit 1; }
+
+kit=$(mktemp -d)
+mnt=$(mktemp -d)
+cleanup() { if mountpoint -q "$mnt"; then umount "$mnt"; fi; rm -rf "$kit"; rmdir "$mnt"; }
+trap cleanup EXIT
+
+echo "==> Building the kit"
+crlf() { sed 's/\r\{0,1\}$/\r/' "$1" > "$2"; }   # Windows line endings
+crlf "$here/theme.cmd" "$kit/1 - Majula theme.cmd"
+crlf "$here/tune.cmd" "$kit/2 - Performance and cleanup.cmd"
+crlf "$here/theme.ps1" "$kit/theme.ps1"
+crlf "$here/tune.ps1" "$kit/tune.ps1"
+mkdir -p "$kit/files/fonts"
+cp "$repo/home/.config/hypr/wallpapers/wallpaper.png" "$build/windows/Drangleic.cur" "$kit/files/"
+cp "$build/fonts/Drangleic.otf" "$nerd"/JetBrainsMonoNerdFont-{Regular,Bold,Italic,BoldItalic}.ttf "$kit/files/fonts/"
+cp "$repo/home/.config/Code/User/settings.json" "$kit/files/vscode-settings.json"
+python3 "$repo/vscode/build-vsix.py" "$repo/vscode/majula-theme" "$kit/files/majula-theme.vsix" >/dev/null
+
+echo "==> Finding the Windows partition"
+win=""
+while read -r dev fs; do
+  [[ $fs == ntfs ]] || continue
+  mount -t ntfs3 -o ro "$dev" "$mnt" 2>/dev/null || continue
+  [[ -d $mnt/Windows/System32 ]] && win=$dev
+  umount "$mnt"
+  [[ -n $win ]] && break
+done < <(lsblk -rpno NAME,FSTYPE)
+[[ -n $win ]] || { echo "No Windows partition found" >&2; exit 1; }
+echo "    $win"
+
+# Windows with Fast Startup is hibernated, not shut down: writing to it then can corrupt it.
+mount -t ntfs3 -o ro "$win" "$mnt"
+hib=$(find "$mnt" -maxdepth 1 -iname hiberfil.sys -print -quit)
+sig=""
+[[ -n $hib ]] && sig=$(head -c4 "$hib" | tr -d '\0' | tr '[:upper:]' '[:lower:]')
+mapfile -t users < <(find "$mnt/Users" -mindepth 1 -maxdepth 1 -type d \
+  ! -iname public ! -iname default ! -iname 'defaultuser*' -printf '%f\n')
+umount "$mnt"
+if [[ -n $sig && $sig != wake ]]; then
+  echo "Windows is hibernated (Fast Startup is on), so writing to it now could corrupt it." >&2
+  echo "Start Windows and use Restart (not Shut down), then run this again from Arch." >&2
+  exit 1
+fi
+
+echo "==> Copying it to the desktop"
+mount -t ntfs3 "$win" "$mnt"
+for u in "${users[@]}"; do
+  desk="$mnt/Users/$u/Desktop"
+  for d in "$mnt/Users/$u/OneDrive"*/Desktop; do [[ -d $d ]] && desk=$d; done
+  [[ -d $desk ]] || continue
+  dest="$desk/Majula"
+  if [[ -e $dest && ! -e $dest/theme.ps1 ]]; then
+    echo "    skipped C:${dest#"$mnt"}: a different Majula folder is already there" >&2
+    continue
+  fi
+  rm -rf "$dest"
+  cp -r "$kit" "$dest"
+  echo "    C:${dest#"$mnt"}" | tr / '\\'
+done
+sync
+echo "Done. In Windows, open the Majula folder on the desktop and run its two scripts."

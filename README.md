@@ -25,6 +25,7 @@ A warm, dark Hyprland desktop for Arch Linux inspired by Majula from Dark Souls 
 | Rice showcase | `home/.config/hypr/scripts/rice`, `home/.config/fastfetch/`, `cava/`, `btop/` |
 | Keypad keyboard option | `home/.config/xkb/` |
 | Login screen (SDDM), boot screen, Limine and system settings | `system/` |
+| Windows side of the dual boot: same look, performance and cleanup | `windows/` |
 
 The setup targets one notebook (Samsung 300E5M, 1366x768, Hyprland 0.56 with the Lua config under UWSM, SDDM, ABNT2 keyboard), so sizes are tuned for that screen.
 
@@ -129,12 +130,39 @@ The Limine menu is hidden; hold any key while the notebook starts to see it. It 
 2. Shrink the Arch partition from a live USB (it can't shrink while mounted) and install Windows in the free space. 80 GB is plenty for Windows and some development.
 3. If the notebook boots straight into Windows afterwards, open the firmware boot menu and pick "Majula (Limine)".
 4. Back in Arch, run `sudo bash system/apply-system.sh` again. It puts Limine back in place, adds Windows to the Limine menu, and enables "Drangleic (Windows)" in Travel and "Reboot into Windows" in Burn (it sets the next boot to Windows once and restarts).
-5. In Windows, keep the clock right (Linux stores UTC) and turn off Fast Startup, from an admin terminal:
+5. In Windows, keep the clock right (Linux stores UTC) and turn off Fast Startup. "2 - Performance and cleanup" from the [Windows kit](#windows) does both; by hand, from an admin terminal:
 
    ```bat
    reg add "HKLM\System\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /t REG_DWORD /d 1 /f
    powercfg /h off
    ```
+
+Restarting from Windows starts Arch again, because Limine comes first. Hold a key while the notebook starts and pick "Windows" in the Limine menu to go back.
+
+## Windows
+
+Windows gets the same look where it lets you change it, plus a performance and cleanup pass. From Arch, `sudo bash windows/copy-to-windows` puts a "Majula" folder on the Windows desktop. It refuses while Windows is hibernated by Fast Startup, since writing to it then can corrupt it. In Windows, run the folder's two scripts; each asks for admin rights and can be run again.
+
+**1 - Majula theme** (`windows/theme.ps1`)
+
+- The Majula wallpaper on the desktop and the lock screen, without Spotlight pictures or tips
+- Dark mode with the gold accent (`#D1A35C`), saved as the "Majula" theme in Settings
+- The game's cursor (only the arrow, like on Arch), also listed as the "Majula" pointer scheme
+- Drangleic and JetBrainsMono Nerd Font installed
+- Windows Terminal with kitty's colors, font, opacity and padding (its old settings are kept as `settings.json.majula-backup`)
+- VS Code with the Majula theme, and the Arch settings added on top of the existing ones (also backed up)
+
+**2 - Performance and cleanup** (`windows/tune.ps1`)
+
+- Clock in UTC, and Fast Startup and hibernation off, for the dual boot
+- Ultimate Performance power plan: the CPU stays at full speed, on battery too. The screen turns off after 15 minutes; no sleep when plugged in
+- No animations or transparency (shadows and font smoothing stay), Game Mode on, background game recording off
+- No ads, tips, suggested apps or web results in Start; no advertising ID, feedback prompts or telemetry service (DiagTrack); Windows Update downloads only from Microsoft
+- No Widgets or Task View button, search as an icon, file extensions shown, Explorer opens on This PC
+- Removes preinstalled extras such as Clipchamp, News, Weather, Solitaire, Teams, the new Outlook, Copilot and promoted apps (Spotify, TikTok...), when present. Store, Edge, OneDrive, Xbox and the basic apps stay
+- Clears temporary files and old update files
+
+Left alone on purpose: the system font (Windows has no setting for it, and registry tricks leave parts of it broken) and the Windows boot animation (changing it means patching boot files, which can break the dual boot). To pick another lock screen picture later, delete the `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\PersonalizationCSP` key.
 
 ## Idle
 

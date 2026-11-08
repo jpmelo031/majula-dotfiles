@@ -48,6 +48,7 @@ ds2-assets/
     ├── rofi/                 window.png, selected.png
     ├── plymouth/             majula-ds2/ theme, preview.png
     ├── desktop/              cursor (icons/), notifications/
+    ├── windows/              Drangleic.cur, the cursor for windows/theme.ps1
     └── kvantum/Drangleic/    the Qt theme
 ```
 
